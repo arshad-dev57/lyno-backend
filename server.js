@@ -1,4 +1,3 @@
-// /api/server.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -7,11 +6,11 @@ const morgan = require('morgan');
 const path = require('path');
 
 // Routes
-const cartRoutes = require("../routes/cart.routes");
-const productRoutes = require("../routes/product.routes");
-const authRoutes = require("../routes/auth.routes");
-const orderRoutes = require("../routes/order.routes");
-const categoryRoutes = require("../routes/category.routes");
+const cartRoutes = require("./routes/cart.routes");
+const productRoutes = require("./routes/product.routes");
+const authRoutes = require("./routes/auth.routes");
+const orderRoutes = require("./routes/order.routes");
+const categoryRoutes = require("./routes/category.routes");
 
 const app = express();
 

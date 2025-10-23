@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const ctrl = require("../controllers/cart.controller");
+const ctrl = require("../controller/cart.controller");
 const auth = require("../middleware/auth_middleware");
 router.get("/get", auth, ctrl.getCart);
 router.post("/add", auth, ctrl.addItem);

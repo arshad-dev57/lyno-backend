@@ -3,8 +3,8 @@
 // Option A: simple one-liner
 const router = require("express").Router();
 
-const grp = require("../controllers/categorygroup.controller");
-const cat = require("../controllers/category.controller");
+const grp = require("../controller/categorygroup.controller");
+const cat = require("../controller/category.controller");
 
 router.post("/category-groups", grp.createGroup);
 router.get("/category-groups", grp.getGroups); // ?i=true

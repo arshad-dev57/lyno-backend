@@ -1,6 +1,6 @@
 // routes/order.routes.js
 const router = require("express").Router();
-const ctrl = require("../controllers/order.controller");
+const ctrl = require("../controller/order.controller");
 const auth = require("../middleware/auth_middleware");
 
 // User

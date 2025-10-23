@@ -1,21 +1,19 @@
 {
-  "version": 2,
-  "functions": {
-    "api/server.js": {
-      "runtime": "nodejs18.x",
-      "includeFiles": [
-        "routes/**",
-        "controllers/**",
-        "Controllers/**",
-        "models/**",
-        "middleware/**",
-        "public/**"
-      ]
-    }
-  },
-  "routes": [
-    { "src": "^/api/(.*)$", "dest": "/api/server.js" },
-    { "src": "^/uploads/(.*)$", "dest": "/api/server.js" },
-    { "src": "^(?!/api).*", "dest": "/api/server.js" }
-  ]
+    "version": 2,
+    "builds": [
+        {
+            "src": "./server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/uploads/(.*)",
+            "dest": "/public/Images/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/server.js"
+        }
+    ]
 }
