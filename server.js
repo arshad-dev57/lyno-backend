@@ -35,9 +35,17 @@ app.use('/api/orders', orderRoutes);
 
 // MongoDB
 const { MONGO_URI } = process.env;
-mongoose.connect(MONGO_URI, { autoIndex: true })
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err.message));
+
+const dbConnection = async () => {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log('✅ MongoDB connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+  }
+}
+dbConnection();
 
 // Vercel: export app (no app.listen)
+app.listen(5000, () => console.log('✅ Server running on port 5000'));
 module.exports = app;
