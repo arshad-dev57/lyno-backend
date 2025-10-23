@@ -20,13 +20,12 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Static file handling (for uploads/images)
+// Static for uploads (optional)
 app.use('/uploads', express.static(path.join(__dirname, '../public/Images')));
 
-// Default route
-app.get('/', (req, res) => {
-  res.json({ ok: true, message: '✅ API is running successfully!' });
-});
+// Quick health checks
+app.get('/api/health', (_req, res) => res.json({ ok: true, where: 'health' }));
+app.get('/', (_req, res) => res.json({ ok: true, message: '✅ API is running successfully!' }));
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -35,11 +34,11 @@ app.use('/api/product', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
-// MongoDB connection
+// MongoDB
 const { MONGO_URI } = process.env;
 mongoose.connect(MONGO_URI, { autoIndex: true })
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err.message));
 
-// 🚫 DO NOT use app.listen() here — Vercel will handle it automatically
+// Vercel: export app (no app.listen)
 module.exports = app;
