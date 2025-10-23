@@ -3,7 +3,7 @@
 // Option A: simple one-liner
 const router = require("express").Router();
 
-const grp = require("../controllers/categoryGroup.controller");
+const grp = require("../Controllers/categorygroup.controller");
 
 const cat = require("../controllers/category.controller");
 
