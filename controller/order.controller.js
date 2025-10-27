@@ -106,16 +106,39 @@ exports.myOrders = async (req, res) => {
   }
 };
 
-// user: single order detail
-exports.getMyOrder = async (req, res) => {
+
+ 
+exports.listMyOrders = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { id } = req.params;
-    const item = await Order.findOne({ _id: id, user: userId });
-    if (!item) return res.status(404).json({ success: false, message: "Order not found" });
-    res.json({ success: true, data: item });
+    const userId = req.user.id;               // from auth middleware
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Number(req.query.limit) || 20);
+    const { status } = req.query;
+
+    const filter = { user: userId };
+    if (status) filter.status = status;
+
+    const [items, total] = await Promise.all([
+      Order.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select(
+          "orderNo status grandTotal currency createdAt " +
+          "items.title items.image items.qty items.priceSale"
+        )
+        // .populate("items.product", "title image priceSale") // <-- enable if needed
+        .lean(),
+      Order.countDocuments(filter),
+    ]);
+
+    return res.json({
+      success: true,
+      data: items,
+      meta: { page, limit, total }
+    });
   } catch (e) {
-    res.status(400).json({ success: false, message: e.message });
+    return res.status(400).json({ success: false, message: e.message });
   }
 };
 

@@ -65,36 +65,80 @@ exports.getCart = async (req, res) => {
     return res.status(500).json({ success: false, message: e.message });
   }
 };
-
 exports.updateQty = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?._id || req.user?.id || req.user?.sub;
     const { productId, qty } = req.body;
 
+    // 1. auth check
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    // 2. validate inputs
     if (!isValidObjectId(productId)) {
-      return res.status(400).json({ success: false, message: "Invalid productId" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid productId" });
     }
+
     if (qty <= 0) {
-      return res.status(400).json({ success: false, message: "qty must be >= 1" });
+      return res
+        .status(400)
+        .json({ success: false, message: "qty must be >= 1" });
     }
 
+    // 3. load user's cart
     const cart = await Cart.findOne({ user: userId });
-    if (!cart) return res.status(404).json({ success: false, message: "Cart not found" });
-
-    const idx = cart.items.findIndex((it) => String(it.product) === productId);
-    if (idx < 0) return res.status(404).json({ success: false, message: "Item not found in cart" });
-    const prod = await Product.findById(productId).select("stockQty").lean();
-    if (prod && prod.stockQty < qty) {
-      return res.status(400).json({ success: false, message: "Insufficient stock" });
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Cart not found" });
     }
 
+    // 4. find product line in cart
+    const idx = cart.items.findIndex(
+      (it) => String(it.product) === String(productId)
+    );
+    if (idx < 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Item not found in cart" });
+    }
+
+    // 5. stock check
+    const prod = await Product.findById(productId)
+      .select("stockQty")
+      .lean();
+
+    if (prod && prod.stockQty < qty) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient stock",
+      });
+    }
+
+    // 6. UPDATE THE CORRECT FIELD
+    // your schema uses "qty", not "quantity"
     cart.items[idx].qty = qty;
+
+    // 7. recalc totals
     cart.recalculate({ taxPercent: TAX_PERCENT });
+
+    // 8. save
     await cart.save();
 
-    return res.json({ success: true, data: cart });
+    // 9. send updated cart back
+    return res.json({
+      success: true,
+      data: cart,
+    });
   } catch (e) {
-    return res.status(400).json({ success: false, message: e.message });
+    console.error("updateQty error:", e);
+    return res.status(400).json({
+      success: false,
+      message: e.message || "Error updating quantity",
+    });
   }
 };
 

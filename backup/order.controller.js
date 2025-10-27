@@ -9,7 +9,6 @@ exports.placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // client se aayega (checkout screen se)
     const {
       address,                 
       paymentMethod = "cod",  
